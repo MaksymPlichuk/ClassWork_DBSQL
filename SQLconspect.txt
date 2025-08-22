@@ -1,0 +1,318 @@
+﻿
+SQL conspect
+----------------------
+01_IntroToDatabasesSQLQueries
+
+ DB -Intro to Databases, SQL Queries
+ 
+
+
+SQL мова структурованих запитів (Structured Query Language) - це декларативна мова програмування, яка використовується для управління та роботи з даними в реляційних базах даних. Вона дозволяє створювати, змінювати, видаляти та отримувати дані з баз даних
+
+
+СУБД - система управління баз данних
+
+
+реляційна БД - БД яка зберігає звязані об'єкти
+
+
+SQL - вся інформація представлена у таблицях
+
+
+				типи даних
+Назва				Діапазон					Пам'ять
+
+bigint		ВІД -9 223 372 036 854 775 808		8 байт
+			до 9 223 372 036 854 775 807
+			
+int			ВІД -2 147 483 648 ДО 2 147 483 647  4 байта
+smallint	ВІД -32 768 до 32 767				 2 байта
+tinyint		ВІД 0 до 255						 1 байт
+
+bit 		ВІД 0 ДО 1	TRUE/FALSE						
+
+
+money		від -922 337 203 685 477,5808		8 байт
+			до 922 337 203 685 477,5807	
+			
+smallmoney	ВІД -214 748,3648 до 214 748,3647	4 байта		Тип для зберігання менш точних валютних сум, має менший діапазон, ніж money.
+
+float(double)	-1.79E+308 до 1.79E+308 (приблизно)	8 байт		Тип для зберігання чисел з плаваючою комою великої точності, використовується для наукових обчислень.
+
+real(float)		-3.40E+38 до 3.40E+38 (приблизно)	4 байта		Тип для зберігання чисел з плаваючою комою, але менш точний, ніж float.
+
+char	Фіксована кількість символів (1-8000 символів)	1 байт на символ	Тип для зберігання рядків фіксованої довжини. Якщо рядок коротший за визначену довжину, решта символів заповнюється пробілами.
+
+nvarchar	0 до 4 000 символів (потрібно більше для Unicode символів)	2 байта на символ	Тип для зберігання рядків змінної довжини, який підтримує Unicode символи (забезпечує підтримку різних мов і символів).
+
+---
+
+char(n)		- без кодування Unicode фіксованої довжини
+varchar(n|max)	- без кодування Unicode змінної довжини
+
+
+nchar(n)		- З кодуванням Unicode фіксованої довжини
+nvarchar(n|max)	- З кодуванням Unicode змінної довжини
+
+----------------------
+02_SQLCommands
+
+ DB - SQL Commands
+
+
+---SQL commands---
+
+ DDL - data defenition language
+ 
+	create   - створює новий об'єкт		 
+	alter    - міняє існуючий об'єкт У ТАБЛИЦІ			 
+	drop     - видаляє без онулення інформації		 
+	rename   - переіменовує
+	truncate - видаляє з онуленням
+
+	comment  - 
+
+ DML - data modeling language
+
+	select - вибір таблиці 
+	insert - додає новий запис в таблицю		  
+	update - оновити значення У КОМІРЦІ		   
+	delete - видаляє 1 рядок
+
+	merge  - об'єднати	
+	call   -	
+	expain plan	
+	lock table
+	
+ DCL - для адміністрування
+
+	Grant -	
+	Revoke -
+
+ TCL - транзакції
+
+	commit	
+	rollback	
+	savepoint
+	set transaction
+	
+	
+---SQL commands---
+
+ виділяємо рядок а потім execute щоб його виконати
+
+ primary key - ключ унікальний неповторний
+
+--	коментар	| 	/* */  багаторядковий коментар
+
+create DAtAbase University_PD411	/створить БД не зважаючи на регістр
+
+
+ drop  University_PD411 	//delete  University_PD411
+ 
+ use  University_PD411		//вибрати  University_PD411
+
+
+/*
+constraint1 constraint2 constraint3.....
+	1. Column parameters
+		- NULL(default)	| NOT NULL
+		- Unique
+		- primary key (unique)
+		- Identity(start,step)	identity(1,1) - default //автозбільшення
+		- default(value)
+		- check(condition)
+		logic operator : >  <  >=  <=  <>(!=) ==  !<  !>
+		logic i(&&)	: and
+		logic or (||): or
+*/
+
+create table Students(
+	
+	--name type constraint1 constraint2 constraint3....
+		
+			(містить NOT NULL unique)
+	Id int primary key identity,		//створ ключ Id який унікальний і не null
+	
+	Name nvarchar(50) not null 			check(Name <>''),
+	Lastname nvarchar(50) not null 		check(Lastame <>''),
+	Surname nvarchar(50) not null 		check(Surname <>''),
+	
+										/DateTime.Now
+	Birthday date not null check(Birthday < GETDATE()),
+	
+	Phone char(13) not null,	//13 символів обовязково	
+	Adress nvarchar(50) null,	
+	
+						/AverageMark >= 1 and AverageMark <= 12
+	AverageMark float not null check(AverageMark between 1 and 12),
+	
+	IsDebtor bit not null default(0),
+	Lessons int not null check(Lessons >= 0),
+	
+	Fails int not null check(Fails >= 0),	//Fails < Lessons - помилка
+	
+	Visiting as Lessons - Fails
+	
+	--level statment	(бачить усі колонки)
+	check( Fails < Lessons)
+);
+
+select * from Students
+
+--Заповнюємо таблицю значеннями--	
+
+insert into Students
+
+		name   Lastname		surname		birthday	phone		adress	avg   debt  lesons fails
+values('Oleg','Petrovich','Oliunuk','1990-12-15','+380987654321','Rivne',7.9,default,150,15),
+('Petro','Petrovich','Oliunuk','2006-12-15','+380933354321','Rivne',10.9,default,100,15),
+('Ivan','Petrovich','Oliunuk','1998-12-15','+380987668327','Rivne',9.9,1,120,15)
+
+
+----------------------
+03_SQLQueryCommandsSelectInsertUpdateDelete
+
+ DB - SQL. Query Commands. SELECT, INSERT, UPDATE, DELETE Запити
+
+ alter  - міняє існуючий об'єкт У ТАБЛИЦІ	
+
+		-ALTER-
+	
+alter table Students	
+	//пропис всі остальні constraint що були
+alter column Name nvarchar(100) not null
+
+
+	alter table Students
+--alter DegreeDate date not null	//помилка бо неможе записати null черз constraint
+
+alter DegreeDate date not null default(getdate())   //рішення
+
+
+//not null -> null | можна alter column Name nvarchar(100) NULL
+
+//null -> not null | не можна
+
+
+		-EXECUTE-
+
+		/rename			з 				на
+execute sp_rename 'Students.Phone', 'PhoneNumber', 'COLUMN'
+
+
+		-SELECT-	/показує
+
+/*
+select що саме
+from звідки
+додат параметри (фільтрації, сортування, групування)
+
+select column1, column2
+from table1
+where умова - фільтрації
+order by ключ - сортування
+
+*/
+
+select * from Students
+
+select Name, Surname, AverageMark
+from Students
+
+select Name, Surname, AverageMark, DegreeDate
+from Students
+
+
+		//1 колонка		//2 колонка
+select [Name] + ' ' + Surname, AverageMark *10	//[] означ наш елемент
+from Students
+
+		//as виводть назву колонки зверху
+		//as [ Mark ] - вказ назву для колонки
+select [Name] + ' ' + Surname as 'Full Name', 
+						AverageMark *10 as [Mark]
+from Students
+
+				//Чистий SQL
+			//CAST перетвор з float на nvarchar
+ select 'Student' + Surname + ' has ' 
+ 			+ CAST(AverageMark as nvarchar(10)) as 'Full info'
+ from Students
+
+		
+				//T-SQL
+select 'Student' + Surname + ' has ' 
+			+ CONVERT(nvarchar(10), AverageMark) as [Full info]
+from Students
+
+
+		-TOP-		/бере перші по списку
+		
+	//перші 3 записи	
+select TOP(3) [Name] + ' ' + Surname as FullName, 
+		AverageMark *10 as[Average Mark] 	
+from Student		
+		
+		
+	//перші ПОЛОВИНА записів
+select TOP 50 PERCENT [Name] + ' ' + Surname as FullName, 
+		AverageMark *10 as[Average Mark] 	
+from Student		
+		
+		
+		-Distinct-		/урізає дублікати
+		
+select Distinct Name,Surname
+from Students		
+		
+		
+		-Where-		/Фільтрує по заданій умові
+		
+		logic operator : >  <  >=  <=  <>(!=) =(C# ==)  !<  !>
+		logic i(&&)	: and
+		logic or (||): or
+	
+select *
+from Students		//показ всіх у кого AverageMark >= 10
+where AverageMark >= 10	
+
+where Name <>'Oleg'	// всі хто не Oleg
+
+
+		=Функції для отримання дати=	
+
+	DAY(date) - повертає день з дати
+	MONTH(date) - повертає місяць з дати
+	YEAR(date)  - повертає рік з дати
+
+select *
+from Students		//показ День народження Літом
+where Month(Birthday) between 6 and 8
+
+where YEAR(Birthday) = 2000 or YEAR(birthday) = 1999
+	//or
+where YEAR(Birthday) in (2000,1999)
+
+
+		=Where Name LIKE 'pattern'=
+
+[value] LIKE 'pattern' - перевіряє значення [value] на відповідність 
+							шаблону
+
+	% будь-яка кількість символів
+	
+	_ будь-який один символ
+	
+	[] будь-який символ, який наявний в дужках
+	
+	[^] будь-який символ, який НЕ наявний в дужках
+
+
+	-Order By -
+
+Select * from Students
+where AverageMark in (11,8.5,9)
+order by AverageMark desc	 //asc(default)
+
+order by Surname, Name
