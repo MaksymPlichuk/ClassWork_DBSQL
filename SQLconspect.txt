@@ -1,6 +1,6 @@
 ﻿
 SQL conspect
-----------------------
+------------------------------------------------------------------
 01_IntroToDatabasesSQLQueries
 
  DB -Intro to Databases, SQL Queries
@@ -54,7 +54,7 @@ varchar(n|max)	- без кодування Unicode змінної довжини
 nchar(n)		- З кодуванням Unicode фіксованої довжини
 nvarchar(n|max)	- З кодуванням Unicode змінної довжини
 
-----------------------
+------------------------------------------------------------------
 02_SQLCommands
 
  DB - SQL Commands
@@ -170,7 +170,7 @@ values('Oleg','Petrovich','Oliunuk','1990-12-15','+380987654321','Rivne',7.9,def
 ('Ivan','Petrovich','Oliunuk','1998-12-15','+380987668327','Rivne',9.9,1,120,15)
 
 
-----------------------
+------------------------------------------------------------------
 03_SQLQueryCommandsSelectInsertUpdateDelete
 
  DB - SQL. Query Commands. SELECT, INSERT, UPDATE, DELETE Запити
@@ -316,3 +316,62 @@ where AverageMark in (11,8.5,9)
 order by AverageMark desc	 //asc(default)
 
 order by Surname, Name
+
+
+------------------------------------------------------------------
+04_RelationsForeignKeys
+
+ Type of relations:
+	- one to one 	1...1
+	- one to many 	1...*
+	- many to many	*...*
+	
+	
+Звязки створ по Id
+
+Create table Groups(
+	Id int primary key identity,
+	Name nvarchar(50) not null check (Name <>') unique,
+	StartDate date not null default (GETDATE())
+)
+
+create table Students(
+	Id int primary key identity,
+	Name nvarchar(50) not null check (Name <>**),
+	Lastname nvarchar(50) not null check(Lastname <>''),
+	Birthdate date not null check (Birthdate < GETDATE()),
+	Phone char(13) not null,
+	Email nvarchar(50) null,
+	AverageMark float not null check (AverageMark between 1 and 12),
+	Lessons int not null check (Lessons >= 0),
+	
+	--References	- foreign key (зовнішній ключ)
+		//one to many
+		
+	GroupId int not null references Groups(Id)	//1....20
+	
+);	
+	
+	create table TeachersGroups
+(
+	TeacherId int not null references Teachers (Id),	1112112--1..20
+	GroupId int not null references Groups (Id),	4 3 5 4 4 3 41...20
+	
+	-- складений первинний ключ
+	primary key (TeacherId, GroupId)
+)
+	
+	
+	
+Many To Many | створ проміжну таблицю з двох
+
+One To Many  | НАЗВАid references НАЗВА(Id)
+
+	//One to Many
+
+DepartmentId int not null references Departments(ID)
+
+//or
+
+alter table Wards
+add foreign key (DepartmentId) references Departments(ID)
