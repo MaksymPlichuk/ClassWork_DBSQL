@@ -322,6 +322,7 @@ order by Surname, Name
 04_RelationsForeignKeys
 
  Type of relations:
+	- zero or one to many 0/1...*
 	- one to one 	1...1
 	- one to many 	1...*		//самий поширений
 	- many to many	*...*
@@ -396,3 +397,51 @@ add foreign key (DepartmentId) references Departments(ID)
 	select s.Name, s.Lastname, s.AverageMark,  g.Name, g.StartDate
 	from Students as s, Groups as g
 	where s.GroupId = g.Id and s.AverageMark >= 10
+
+	
+------------------------------------------------------------------
+05_ JoinOperators
+
+Type of relations:
+	- zero or one to many 0/1...*
+	- one to one 	1...1
+	- one to many 	1...*	
+	- many to many	*...*
+
+
+create table Countries(
+	Name nvarchar(50) not null check (Name <>'')
+	Id int primary key identity,
+)
+
+select * from Countries
+
+update Students
+set CountryId = 1
+
+where Id in(1,5,7,9)
+
+
+select s.Name, s.Lastname, s.AverageMark, g.Name, g.StartDate
+from Students as s, Groups as g
+where s.GroupId = g.Id and s.AverageMark >= 10	
+order by s.AverageMark desc
+
+//або
+
+select s.Name, s.Lastname, s.AverageMark, g.Name, g.StartDate
+from Students as s JOIN Groups as g on s.GroupId = g.ID
+where s.AverageMark >= 10	//фільтрує 
+order by s.AverageMark desc
+
+
+select s.Name, s.Lastname, s.AverageMark s.GroupId 
+
+from Students as s JOIN Group as g ON s.GroupId = g.Id
+where g.Name = 'Група 5'
+
+
+JOIN - з'єднує 2 таблиці між собою але після on вказ ключі 
+			через які їх з'єднуємо (первинний = зовнішній)
+
+Teacher as t JOIN TeacherGroups as tg on t.id = tg.TeacherId
