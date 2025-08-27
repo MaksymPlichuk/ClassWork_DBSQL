@@ -323,7 +323,7 @@ order by Surname, Name
 
  Type of relations:
 	- one to one 	1...1
-	- one to many 	1...*
+	- one to many 	1...*		//самий поширений
 	- many to many	*...*
 	
 	
@@ -352,13 +352,24 @@ create table Students(
 	
 );	
 	
-	create table TeachersGroups
+	
+	create table Teachers
 (
-	TeacherId int not null references Teachers (Id),	1112112--1..20
-	GroupId int not null references Groups (Id),	4 3 5 4 4 3 41...20
+    Id int primary key identity,
+	Name nvarchar(50) not null check(Name <>''),
+	Lastname nvarchar(50) not null check(Lastname <>''),
+	HireDate date not null,
+	Phone nvarchar(20) not null
+);
+		
+	
+	create table TeachersGroups			//проміжна таблиця
+(
+	TeacherId int not null references Teachers (Id), -- 1 1 1 2 7 2 5	1..20
+	GroupId int not null references Groups (Id),	 -- 4 3 5 4 4 3 4 	1...20
 	
 	-- складений первинний ключ
-	primary key (TeacherId, GroupId)
+	primary key (TeacherId, GroupId)	//перевіряє комбінації на дублікат
 )
 	
 	
@@ -375,3 +386,13 @@ DepartmentId int not null references Departments(ID)
 
 alter table Wards
 add foreign key (DepartmentId) references Departments(ID)
+
+
+
+	select Students.Name, Students.Lastname, Students.AverageMark,  Groups.Name, Groups.StartDate
+	from Students, Groups
+	where Students.GroupId = Groups.Id
+	
+	select s.Name, s.Lastname, s.AverageMark,  g.Name, g.StartDate
+	from Students as s, Groups as g
+	where s.GroupId = g.Id and s.AverageMark >= 10
