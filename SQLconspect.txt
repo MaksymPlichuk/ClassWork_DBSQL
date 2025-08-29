@@ -445,3 +445,129 @@ JOIN - з'єднує 2 таблиці між собою але після on в�
 			через які їх з'єднуємо (первинний = зовнішній)
 
 Teacher as t JOIN TeacherGroups as tg on t.id = tg.TeacherId
+
+
+------------------------------------------------------------------
+06_ AggregationGrouping
+
+ update - змінити insert
+
+Агрегатні функції використовуються для обчислення підсумкових значень по групах або всій таблиці.
+
+Функція		Опис
+COUNT(*)	Підраховує кількість рядків
+COUNT(column)	Підраховує кількість НЕ NULL значень у колонці
+SUM(column)	Обчислює суму значень
+AVG(column)	Обчислює середнє значення
+MIN(column)	Знаходить мінімальне значення
+MAX(column)	Знаходить максимальне значення
+
+🔸 Агрегація працює на рівні колонок, а не окремих рядків.
+
+--
+
+ROUND() rounds a number to a specified number of decimal places.
+
+FLOOR() returns the largest integer value that is smaller than or equal to a number.
+
+CEILING() returns the smallest integer value that is larger than or equal to a number.
+
+
+ROUND (AVG(s. AverageMark), 2) as 'Average Mark",
+Sum (s.Lessons) as 'Count lessons
+from Students as s JOIN Groups as g on s.GroupId= g. Id
+select COUNT(s.Id) as 'Count Students',
+where g.Name Група 6'
+
+	агрег функції показують щось одне
+
+
+	при групуванні у
+ select вказ ключ групування або агрегаційна функція
+
+from Students
+select AverageMark, COUNT (Id), Name
+group by AverageMark
+
+
+where - фільтрація початкова
+
+having - фільтрує згруповані данні
+
+
+
+
+--
+
+GROUP BY — групує рядки з однаковими значеннями в одну групу, після чого можна застосовувати агрегатні функції до кожної групи.
+
+📌 Синтаксис:
+SELECT column1, AGG_FUNC(column2)
+FROM table
+GROUP BY column1;
+
+📘 Приклад:
+SELECT GroupId, AVG(AverageMark) as AvgMark
+FROM Students
+GROUP BY GroupId;
+
+
+🔹 GROUP BY має йти після WHERE, але перед ORDER BY.
+
+🔹 HAVING
+
+HAVING — фільтрує групи після GROUP BY, на відміну від WHERE, який фільтрує рядки.
+
+📘 Приклад:
+SELECT GroupId, AVG(AverageMark) as AvgMark
+FROM Students
+GROUP BY GroupId
+HAVING AVG(AverageMark) > 9;
+
+🔹 Комбінації
+
+Можна комбінувати GROUP BY, ORDER BY, HAVING, WHERE:
+
+SELECT GroupId, COUNT(*) as TotalStudents, AVG(AverageMark) as AvgMark
+FROM Students
+WHERE Lessons > 50
+GROUP BY GroupId
+HAVING AVG(AverageMark) >= 8
+ORDER BY AvgMark DESC;
+
+🔹 DISTINCT vs GROUP BY
+
+DISTINCT — прибирає дублікати (у всьому рядку або колонках).
+
+GROUP BY — групує значення і дозволяє використовувати агрегати.
+
+📌 Приклади з практики:
+
+Кількість студентів у кожній групі:
+
+SELECT GroupId, COUNT(*) as StudentCount
+FROM Students
+GROUP BY GroupId;
+
+
+Середній бал студентів по групах, де більше 5 студентів:
+
+SELECT GroupId, AVG(AverageMark) as AvgMark
+FROM Students
+GROUP BY GroupId
+HAVING COUNT(*) > 5;
+
+
+Найвищий бал у кожній групі:
+
+SELECT GroupId, MAX(AverageMark) as MaxMark
+FROM Students
+GROUP BY GroupId;
+
+---
+
+
+
+
+
+
