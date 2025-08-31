@@ -53,9 +53,9 @@ create table GroupsCurators(
 );
 
 create table GroupsLectures(
-	Id int primary key identity,
 	LectureID int not null references Lectures(Id),
-	GroupID int not null references Groups(Id)
+	GroupID int not null references Groups(Id),
+	primary key (LectureID,GroupID)
 );
 
 select * from Subjects;
@@ -65,8 +65,71 @@ select * from Teachers;
 select * from Lectures;
 select * from Departments;
 select * from Curators;
+select * from Groups;
 select * from GroupsCurators;
 select * from GroupsLectures;
+
+----------------------
+
+select g.Name,t.Name,t.Surname
+from Teachers as t join Lectures as l on l.TeacherId=t.Id
+				join GroupsLectures as gl on gl.LectureID=l.Id
+				join Groups as g on gl.GroupID = g.Id
+
+select f.Name
+from Departments as d Join Faculties as f on d.FaculityID=f.Id
+where d.Financing>f.Financing
+
+select c.Surname,g.Name
+from Curators as c join GroupsCurators as gc on gc.CuratorID=c.Id
+				join Groups as g on gc.GroupID=g.Id
+
+select t.Name,t.Surname
+from Teachers as t join Lectures as l on l.TeacherId=t.Id
+				join GroupsLectures as gl on gl.LectureID=l.Id
+				join Groups as g on gl.GroupID = g.Id
+where g.Name='P107'
+
+select t.Surname,f.Name
+from Teachers as t join Lectures as l on l.TeacherId=t.Id
+				join GroupsLectures as gl on gl.LectureID=l.Id
+				join Groups as g on g.Id=gl.GroupID
+				join Departments as d on d.Id=g.DepartmentId
+				join Faculties as f on f.Id=d.FaculityID
+
+select d.Name,g.Name
+from Departments as d join Groups as g on d.Id=g.DepartmentId
+
+select s.Name
+from Teachers as t join Lectures as l on t.Id=l.TeacherId
+				join Subjects as s on s.Id=l.SubjectId
+where t.Name='Adams' and t.Surname='Samantha'
+
+select d.Name
+from Subjects as s join Lectures as l on l.SubjectId=s.Id
+				join GroupsLectures as gl on gl.LectureID=l.Id
+				join Groups as g on gl.GroupID=g.Id
+				join Departments as d on d.Id=g.DepartmentId
+				join Faculties as f on f.Id=d.FaculityID
+where s.Name='Database Theory'
+
+select g.Name
+from Groups as g join Departments as d on g.DepartmentId=d.Id
+				join Faculties as f on f.Id=d.FaculityID
+where f.Name='Computer Science'
+
+select g.Name,f.Name
+from Groups as g join Departments as d on g.DepartmentId=d.Id
+				join Faculties as f on d.FaculityID=f.Id
+where g.Year=5
+
+select t.Name+' '+t.Surname as [Full Name],s.Name,g.Name
+from Subjects as s join Lectures as l on s.Id=l.SubjectId
+				join Teachers as t on t.Id=l.TeacherId
+				join GroupsLectures as gl on gl.LectureID=l.Id
+				join Groups as g on gl.GroupID=g.Id
+where l.LectureRoom='B103'
+
 
 ----------------------
 insert into subjects (Name) values ('Curb & Gutter');
@@ -74,7 +137,7 @@ insert into subjects (Name) values ('Retaining Wall and Brick Pavers');
 insert into subjects (Name) values ('Framing (Steel)');
 insert into subjects (Name) values ('Rebar & Wire Mesh Install');
 insert into subjects (Name) values ('Electrical');
-insert into subjects (Name) values ('Drilled Shafts');
+insert into subjects (Name) values ('Database Theory');
 insert into subjects (Name) values ('Soft Flooring and Base');
 insert into subjects (Name) values ('Structural & Misc Steel Erection');
 insert into subjects (Name) values ('Masonry & Precast');
@@ -92,7 +155,7 @@ insert into curators (Name, Surname) values ('Hewet', 'Burgwin');
 insert into curators (Name, Surname) values ('Colleen', 'Britnell');
 
 insert into Faculties (Name, Financing) values ('Hamnet', 121878.79);
-insert into Faculties (Name, Financing) values ('Saba', 31066.25);
+insert into Faculties (Name, Financing) values ('Computer Science', 31066.25);
 insert into Faculties (Name, Financing) values ('Ham', 58327.69);
 insert into Faculties (Name, Financing) values ('Paul', 67100.93);
 insert into Faculties (Name, Financing) values ('Brian', 39644.18);
@@ -111,7 +174,7 @@ insert into Teachers (Name, Salary, Surname) values ('Ashton', 63274.6, 'Sabatti
 insert into Teachers (Name, Salary, Surname) values ('Darius', 62464.67, 'O''Devey');
 insert into Teachers (Name, Salary, Surname) values ('Aggie', 15985.76, 'McKeveney');
 insert into Teachers (Name, Salary, Surname) values ('Catha', 65933.76, 'Willmot');
-insert into Teachers (Name, Salary, Surname) values ('Suzanne', 45654.01, 'Garbett');
+insert into Teachers (Name, Salary, Surname) values ('Adams', 45654.01, 'Samantha');
 
 insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('Northview', 4, 5);
 insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('Shasta', 4, 3);
@@ -123,6 +186,8 @@ insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('Anderson', 7, 
 insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('Ruskin', 3, 1);
 insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('International', 4, 1);
 insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('Buhler', 8, 5);
+insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('8/6 Auditory', 6, 10);
+insert into Lectures (LectureRoom, SubjectId, TeacherId) values ('B103', 6, 10);
 
 insert into Departments (Financing, Name, FaculityID) values (106175.68, 'Vidon', 8);
 insert into Departments (Financing, Name, FaculityID) values (101151.33, 'Loomis', 1);
@@ -134,18 +199,19 @@ insert into Departments (Financing, Name, FaculityID) values (45385.06, 'Sherida
 insert into Departments (Financing, Name, FaculityID) values (50625.84, 'Lillian', 10);
 insert into Departments (Financing, Name, FaculityID) values (134750.62, 'Becker', 3);
 insert into Departments (Financing, Name, FaculityID) values (8288.74, 'Charing Cross', 3);
+insert into Departments (Financing, Name, FaculityID) values (92154.04, 'Coding Camp', 2);
 
-
-insert into Groups (Name, [Year], DepartmentId) values ('dodio', 3, 3);
-insert into Groups (Name, [Year], DepartmentId) values ('acne', 1, 7);
-insert into Groups (Name, [Year], DepartmentId) values ('ins', 1, 7);
-insert into Groups (Name, [Year], DepartmentId) values ('mainec', 5, 1);
-insert into Groups (Name, [Year], DepartmentId) values ('veet', 3, 1);
-insert into Groups (Name, [Year], DepartmentId) values ('sana', 1, 8);
-insert into Groups (Name, [Year], DepartmentId) values ('curoin', 3, 2);
-insert into Groups (Name, [Year], DepartmentId) values ('rhcui', 4, 1);
-insert into Groups (Name, [Year], DepartmentId) values ('neon', 4, 3);
-insert into Groups (Name, [Year], DepartmentId) values ('erat', 4, 3);
+insert into Groups (Name, [Year], DepartmentId) values ('B103', 3, 3);
+insert into Groups (Name, [Year], DepartmentId) values ('P107', 1, 7);
+insert into Groups (Name, [Year], DepartmentId) values ('A308', 1, 7);
+insert into Groups (Name, [Year], DepartmentId) values ('J907', 5, 1);
+insert into Groups (Name, [Year], DepartmentId) values ('C350', 3, 1);
+insert into Groups (Name, [Year], DepartmentId) values ('D055', 1, 8);
+insert into Groups (Name, [Year], DepartmentId) values ('E065', 3, 2);
+insert into Groups (Name, [Year], DepartmentId) values ('F562', 4, 1);
+insert into Groups (Name, [Year], DepartmentId) values ('K987', 4, 3);
+insert into Groups (Name, [Year], DepartmentId) values ('I997', 5, 3);
+insert into Groups (Name, [Year], DepartmentId) values ('B205', 5, 11);
 
 insert into GroupsCurators (CuratorID, GroupID) values (7, 8);
 insert into GroupsCurators (CuratorID, GroupID) values (5, 3);
@@ -168,6 +234,6 @@ insert into GroupsLectures (LectureID, GroupID) values (6, 7);
 insert into GroupsLectures (LectureID, GroupID) values (6, 7);
 insert into GroupsLectures (LectureID, GroupID) values (2, 7);
 insert into GroupsLectures (LectureID, GroupID) values (9, 3);
-
-
-
+insert into GroupsLectures (LectureID, GroupID) values (5, 2);
+insert into GroupsLectures (LectureID, GroupID) values (11, 11);
+insert into GroupsLectures (LectureID, GroupID) values (12, 11);

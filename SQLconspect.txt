@@ -190,9 +190,9 @@ alter column Name nvarchar(100) not null
 alter DegreeDate date not null default(getdate())   //рішення
 
 
-//not null -> null | можна alter column Name nvarchar(100) NULL
-
-//null -> not null | не можна
+	//not null -> null | можна alter column Name nvarchar(100) NULL
+	
+	//null -> not null | не можна
 
 
 		-EXECUTE-
@@ -414,12 +414,17 @@ create table Countries(
 	Id int primary key identity,
 )
 
-select * from Countries
+
+alter table Students
+add CountryId int null references Countries(Id)
+
 
 update Students
 set CountryId = 1
 
 where Id in(1,5,7,9)
+
+
 
 
 select s.Name, s.Lastname, s.AverageMark, g.Name, g.StartDate
