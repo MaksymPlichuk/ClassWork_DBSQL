@@ -108,20 +108,57 @@ where Building = (select Building
 					from Departments
 					where name='Cardiology')
 
+
 select dp.Name
 from Departments as dp
 where Building in (select Building 
 					from Departments
 					where name='Gastroenterology' or name = 'General Surgery')
 
-select dp.Name
+
+select dp.Name,d.Amount
 from Departments as dp join Donations as d on dp.Id=d.DepartmentId
 where d.Amount = (select MIN(Amount)
 					from Donations)
 
+select Surname,Salary
+from Doctors
+where (Salary+Premium) > (select Salary+Premium
+					from Doctors
+					where (Name = 'Thomas' and Surname = 'Gerada'))
 
+select w.Name,w.Places
+from Wards as w
+where (w.Places) > (select AVG(w.Places)
+					from Departments as dp join Wards as w on dp.Id=w.DepartmentId
+					where dp.Name='Microbiology')
 
-select * from Departments
+select Name +' '+Surname as[Full Name],Salary+Premium
+from Doctors
+where (Salary+Premium) > (select Salary+Premium+100
+					from Doctors
+					where Name = 'Anthony' and Surname = 'Davis')
+
+select dp.Name
+from Departments as dp join Wards as w on dp.Id=w.DepartmentId
+					join DoctorsExaminations as de on de.WardId=w.Id
+					join Doctors as doc on doc.Id=de.DoctorId
+where (de.DoctorId) = (select Id
+					from Doctors
+					where Name = 'Joshua' and Surname = 'Bell')
+
+select s.Name,dp.Name
+from Sponsors as s join Donations as d on s.Id=d.SponsorId
+				join Departments as dp on dp.Id=d.DepartmentId
+where (d.DepartmentId) not in (select Id
+						from Departments 
+						where Name = 'Neurology' and Name = 'Oncology')
+
+select doc.Surname,e.Name,de.StartTime,de.EndTime
+from Doctors as doc join DoctorsExaminations as de on doc.Id=de.DoctorId
+					join Examinations as e on e.Id=de.ExaminationId
+where (de.StartTime >='12:00' and de.EndTime <='15:00')
+
 
 -------
 
