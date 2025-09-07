@@ -602,3 +602,96 @@ union all - показує абсолютно все з 2х таблиць
 всередині view не можна робити order by
 дозволяється лише з TOP
 
+як функція  print
+нічог не приймає не повертає
+
+
+ для view можна вказати деякі параметри:
+--		encryption		- view буде зберігатися в зашифрованому вигляді | не змінний через редактор
+--		schemabinding	- забороняє видалення таблиць, представлень та функцій які використовує дане view
+--		view_metadata	- вказує на те, що view в режимі перегляду буде повертати його метадані,
+--						  тобто інформацію про його структуру, а не записи таблиць
+
+
+- ORDER BY дозволяється всередині view лише разом з оператором TOP 
+
+
+ create view Top3GoodStudents (Name, Email, Mark)
+as
+	select top 3 Name, Email, AverageMark
+	from Students
+	where AverageMark >= 9
+	order by AverageMark DESC
+
+
+-- До представлення можна застосовувати DML команди: INSERT, UPDATE, DELETE
+
+insert into GoodStudents	//не безпечно можна додати будь-кого в Students через view GoodStudents
+values ('Inna', 'Oliunuk', 'inna@gmail.com',3.7);
+
+
+	UPDATEABLE VIEW (оновлююче представлення)
+	
+ create or alter view GoodStudentsWithCheck
+as
+	select Name, Lastname, Email, AverageMark
+	from Students
+	where AverageMark >= 7
+	with check option; -- забороняє модифікувати записи (INSERT, UPDATE, DELETE) для записів, які не 
+												підлягають результату VIEW 
+
+
+ insert into GoodStudentsWithCheck		//добре
+values ('Olga', 'Amirov', 'olia@gmail.com', 12);
+
+insert into GoodStudentsWithCheck		//помилка
+values ('Bob', 'hsjhsdkjg', 'OLGA123@gmail.com',3.7);
+
+
+
+--declare @@global_var int = 333;
+--declare @number int = 10;
+
+ select @number as 'Local', @@global_var as 'Global'
+
+
+ =raiserror=
+											//ступінь  //state(Id помилки)
+raiserror('Something went wrong! File: %s, Id: %d', 15, 1, 'main_bd.md', 34);
+
+declare @number INT = 777;
+RAISERROR ('Number: %d %s', 11, 1, @number, 'value')
+-- Severity: 1-10 - warnings (not errors)
+--			11-15 - user errors
+--			16-24 - system errors (18 > fatal error)
+-- %d, %i - digit
+-- %s - string
+-- %u - unsigned digit
+
+select * from sys.messages
+where message_id = 29300
+
+raiserror (29300, 16, 1, 'windows.exe');
+
+
+------------------------------------------------------------------
+09_T-SQLStorageProcedures
+
+procedure - як функція
+ 
+ create procedure ShowHello
+ as	
+ begin	//як {
+ 	print 'Hello world'
+ 	print 'Hello world'
+ 	print 'Hello world'
+ 	
+ end	//як }
+ 
+ execute ShowHello
+
+
+ Скалярна функція - повертає 1 значення
+
+
+declare робить зміння поки скрипт виділений
