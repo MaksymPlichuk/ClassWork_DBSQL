@@ -695,3 +695,18 @@ procedure - як функція
 
 
 declare робить зміння поки скрипт виділений
+
+	процедура з параметром
+	
+ -- with params
+create proc sp_students_list 
+@mark int
+as
+	select * from Students
+	where AverageMark >= @mark
+
+exec sp_students_list 10
+
+
+ ref - прац з оригіналом змінна повинна бути ініціалізована
+ out - прац з оригіналом змінна може бути не ініціалізована

@@ -53,6 +53,163 @@ select* from Countires
 order by Id
 select * from Authors
 select * from Sales
+------
+
+create view BooksPagesRange(BookName,Pages)
+as
+select Name,Pages
+from Books
+where Pages > 500 and Pages <=650
+
+select * from BooksPagesRange
+
+
+create view BooksStartingAZ(BookName)
+as
+select Name
+from Books
+where Name Like N'А%' or Name like N'З%'
+
+select * from BooksStartingAZ
+
+
+create proc BookSelection
+@GenreId int,
+@Quantity int
+as
+begin
+	select b.Name
+	from Books as b join Sales as s on s.BookId=b.Id
+	where @GenreId=b.ThemeId and s.Quantity>@Quantity
+end;
+GO
+
+exec BookSelection @GenreID=3,@Quantity=0
+
+
+create view ContainsMicrosoftinName
+as
+select Name
+from Books
+where Name like '%Microsoft%' and Name not like '%Windows%'
+
+select * from ContainsMicrosoftinName
+
+
+create view PagePriceLess65coins
+as
+select b.Name +', ' + t.Name +', ' + a.Name +' '+a.Surname as [Full Info]
+from Books as b join Authors as a on a.Id=b.AuthorId
+				join Themes as t on t.Id=b.ThemeId
+where b.Price/b.Pages < 0.65
+
+select* from PagePriceLess65coins
+
+
+create view BooksName4Words
+as
+select Name as [BookName]
+from Books
+where Name LIKE '% % % %'
+  AND Name NOT LIKE '% % % % %';
+
+select* from BooksName4Words
+
+
+create view BooksWithParams(BookName,Theme,AuthorName,Price,Quantity,ShopName)
+as
+select b.Name,t.Name,a.Name+' '+a.Surname,s.Price,s.Quantity,sp.Name
+from Books as b join Sales as s on s.BookId=b.Id
+				join Themes as t on t.Id=b.ThemeId
+				join Authors as a on a.Id=b.AuthorId
+				join Shops as sp on sp.Id=s.ShopId
+
+where b.Name not like '%A%' and b.ThemeId!=17
+and a.Name!='Herbert'and a.Surname!='Shield' and s.Price>100 and s.Price<200 
+and s.Quantity>8 and sp.Id=1
+
+select * from BooksWithParams
+
+
+select 'Number Of Authors',COUNT(Id)
+from Authors
+UNION
+select 'Number Of Books',COUNT(Id)
+from Books
+UNION
+select 'Average Sell Price',AVG(Price)
+from Sales
+UNION
+select 'Average Page Count',AVG(Pages)
+from Books
+
+create view ThemePages(Theme,TotalPages)
+as
+select t.Name,SUM(b.Pages)
+from Books as b join Themes as t on t.Id=b.ThemeId
+group by t.Name
+
+select * from ThemePages
+
+
+create view AuthorBooksCount(AuthorName,NumberOfBooks,TotalPages)
+as
+select a.Name+' '+a.Surname,COUNT(b.Id),SUM(b.Pages)
+from Books as b join Authors as a on a.Id=b.AuthorId
+group by a.Name,a.Surname
+
+select * from AuthorBooksCount
+
+
+create view ProgramingBooksWithMaxPages(BookName,NumberOfPages)
+as
+select Name,Pages
+from Books
+where ThemeId=17 and Pages = (select (MAX(Pages))from Books)
+
+select* from ProgramingBooksWithMaxPages
+
+
+create view ThemesAvgPagesLess400(ThemeName,AvgPages)
+as
+select t.Name,AVG(Pages)
+from Books as b join Themes as t on t.Id=b.ThemeId
+group by t.Name
+having AVG(Pages)<400 
+
+select * from ThemesAvgPagesLess400
+
+
+create view SumOfThemesCodingAdminDesign(Theme,NumberOfPages)
+as
+select t.Name,SUM(b.Pages)
+from Books as b join Themes as t on t.Id=b.ThemeId
+where b.Pages>400 and t.Id=16 or t.Id=17 or t.Id=18
+group by t.Name
+
+select * from SumOfThemesCodingAdminDesign
+
+
+create view ShopWorkInfo(ShopName,BookName,SaleDate,Price,Quantity)
+as
+select sp.Name,b.Name,s.SaleDate,s.Price,s.Quantity
+from Shops as sp join Sales as s on s.ShopId=sp.Id
+				join Books as b on s.BookId=b.Id
+				join Countires as c on c.Id=sp.CountryId
+
+select* from ShopWorkInfo
+
+
+create view MostProfitableShop(ShopName,BookName,SaleDate,Price,Quantity,TotalProfit)
+as
+select sp.Name,b.Name,s.SaleDate,s.Price,s.Quantity,MAX(s.Price*s.Quantity)
+from Shops as sp join Sales as s on s.ShopId=sp.Id
+				join Books as b on s.BookId=b.Id
+				join Countires as c on c.Id=sp.CountryId
+where s.Price*s.Quantity= (select(MAX(Price*Quantity))from Sales)
+group by sp.Name,b.Name,s.SaleDate,s.Price,s.Quantity
+
+select* from MostProfitableShop
 
 
 -------
@@ -72,6 +229,9 @@ insert into Themes (Name) values ('Poetry');
 insert into Themes (Name) values ('Politics');
 insert into Themes (Name) values ('Satire');
 insert into Themes (Name) values ('Mythology');
+insert into Themes (Name) values ('Administration');
+insert into Themes (Name) values ('Computer Science');
+insert into Themes (Name) values ('Design');
 go
 insert into Countires (Name) values ('Ukraine');
 insert into Countires (Name) values ('USA');
@@ -120,6 +280,10 @@ insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('
 insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('Cloudstreet', 430, 270, '1991-01-01', 13, 4);
 insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('The Alchemist', 210, 230, '1988-04-15', 14, 14);
 insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('The God', 340, 250, '1997-05-04', 15, 3);
+insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('Автономна Україна', 1600, 250, '1917-06-20', 3, 16);
+insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('Microsoft Excel', 1600, 250, '2005-04-29', 9, 17);
+insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('Microsoft Windows in Nuthshell', 1600, 250, '2005-04-29', 9, 17);
+insert into Books (Name, Pages, Price, PublishDate, AuthorId, ThemeId) values ('The Rules of Design', 800, 175, '2012-09-17', 2, 18);
 go
 insert into Shops (Name, CountryId) values ('Book Planet', 1);
 insert into Shops (Name, CountryId) values ('Knowledge & Noble', 2);
@@ -152,4 +316,4 @@ insert into Sales (Price, Quantity, SaleDate, BookId, ShopId) values (140, 8, '2
 insert into Sales (Price, Quantity, SaleDate, BookId, ShopId) values (270, 3, '2024-11-15', 13, 13);
 insert into Sales (Price, Quantity, SaleDate, BookId, ShopId) values (230, 9, '2024-11-28', 14, 14);
 insert into Sales (Price, Quantity, SaleDate, BookId, ShopId) values (250, 2, '2024-12-10', 15, 15);
-
+insert into Sales (Price, Quantity, SaleDate, BookId, ShopId) values (110, 50, '2025-04-10', 10, 1);
